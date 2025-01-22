@@ -36,3 +36,7 @@ build/
 *.tfstate*
 *.lock*
 .terraform*
+
+*.pem
+pemkey*
+userdata.tpl

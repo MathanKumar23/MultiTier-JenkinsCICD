@@ -3,7 +3,7 @@ vnet_name          = "terra_vnet"
 vent_address_space = "198.168.0.0/16"
 # if required to create multiple subnet, create using this list(object) type
 subnets = {
-  "subnet1" = {
+  "subnet-1" = {
     name             = "subnet1"
     address_prefixes = "198.168.10.0/24"
   }
@@ -46,10 +46,36 @@ nsg_rules = [
     destination_port_range     = "8080"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
+  },
+  {
+    name                       = "Allow9000"
+    priority                   = "130"
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "9000"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  },
+  {
+    name                       = "Allow8001"
+    priority                   = "140"
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "8001"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 ]
 
 public_ip         = "10.0.0.10"
 allocation_method = "Static"
-vm_name           = "terra_vm"
-vm_size           = "Standard_DS1_v2"
+nic_name          = "terraNic"
+vm_name           = "terraVm"
+
+#Standard_B4ms 4Cpus 16GBi , Standard_D2s_v3 # 2Cpus 8Gbi RAM
+vm_size = "Standard_B4ms" # 2Cpus 8Gbi RAM
+

@@ -95,7 +95,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   name                  = var.vm_name
   resource_group_name   = data.azurerm_resource_group.rg.name
   location              = data.azurerm_resource_group.rg.location
-  network_interface_ids = azurerm_network_interface.nic.id
+  network_interface_ids = [azurerm_network_interface.nic.id]
   size                  = var.vm_size
   admin_username        = "azureuser"
 
@@ -111,7 +111,39 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("./pemkey.pem")
+    public_key = file("./pemkey.pub")
   }
-  user_data = filebase64("./userdata.tpl")
+  custom_data = filebase64("./userdata.sh")
+
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
+}
+
+resource "null_resource" "script" {
+  provisioner "file" {
+    source      = "./userdata.sh"
+    destination = "/tmp/userdata.sh"
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = file("./pemkey.pem")
+      host        = azurerm_public_ip.publicip.ip_address
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod 777 /tmp/userdata.sh",
+      "sudo /tmp/userdata.sh",
+      "sudo apt update",
+      "sudo apt install jq uszip -y"
+    ]
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = file("./pemkey.pem")
+      host        = azurerm_public_ip.publicip.ip_address
+    }
+  }
 }
