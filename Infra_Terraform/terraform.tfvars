@@ -7,10 +7,10 @@ subnets = {
     name             = "subnet1"
     address_prefixes = "198.168.10.0/24"
   }
-  #   "subnet2" = {
-  #     name             = "subnet2"
-  #     address_prefixes = "198.168.20.0/24"
-  #   }
+  "subnet-2" = {
+    name             = "subnetAKS"
+    address_prefixes = "198.168.20.0/22"
+  }
 }
 nsg_name = "terra_nsg"
 nsg_rules = [
@@ -59,13 +59,13 @@ nsg_rules = [
     destination_address_prefix = "*"
   },
   {
-    name                       = "Allow8001"
+    name                       = "Allow8081"
     priority                   = "140"
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "*"
     source_port_range          = "*"
-    destination_port_range     = "8001"
+    destination_port_range     = "8081"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
@@ -77,5 +77,16 @@ nic_name          = "terraNic"
 vm_name           = "terraVm"
 
 #Standard_B4ms 4Cpus 16GBi , Standard_D2s_v3 # 2Cpus 8Gbi RAM
-vm_size = "Standard_B4ms" # 2Cpus 8Gbi RAM
+vm_size = "Standard_D2s_v3" # 4Cpus 16Gbi RAM
+
+### ###
+
+env = "dev"
+
+# AKS Cluster Configuration
+cluster_name           = "aks"
+is_aks_cluster_enabled = true
+cluster_version        = "1.29.5"
+default_node_count     = 2
+default_vm_size        = "Standard_B2s" #"Standard_D2s_v3" #"Standard_D4s_v3" B2s
 

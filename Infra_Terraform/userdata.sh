@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 sudo apt update
 sudo apt install nginx -y
 sudo apt install git -y
@@ -26,13 +27,13 @@ sudo apt update
 sudo apt install docker.io -y
 sudo usermod -aG docker jenkins
 sudo usermod -aG docker azureuser
-newgrp docker
+# newgrp docker
 
 ### Sonarqube ###
 docker run -d --name Sonarqube -p 9000:9000 sonarqube:lts-community
 
 ### Nexus3 Installation using docker ###
-docker run -d --name Nexus3 -p 8001:8001 sonartype/nexus:latest
+# docker run -d --name Nexus3 -p 8081:8081 sonatype/nexus3:latest
 
 ### Kubectl ###
 sudo apt update
@@ -40,3 +41,6 @@ sudo apt install curl
 curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 kubectl version --client
+
+echo "Installation complete"
+exit 0

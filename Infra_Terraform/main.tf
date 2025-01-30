@@ -17,7 +17,7 @@ provider "azurerm" {
 
 # Use the Data source block, if need to use already provisioned resiurces from the cloud
 data "azurerm_resource_group" "rg" {
-  name = "Example_terra"
+  name = "Terra_Example"
 }
 
 # resource "azurerm_resource_group" "rg" {
@@ -25,7 +25,7 @@ data "azurerm_resource_group" "rg" {
 #     location = var.location
 # }
 
-resource "azurerm_virtual_network" "vent" {
+resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
@@ -37,7 +37,7 @@ resource "azurerm_subnet" "subnet" {
   for_each             = var.subnets
   name                 = each.value.name
   address_prefixes     = [each.value.address_prefixes]
-  virtual_network_name = azurerm_virtual_network.vent.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
   resource_group_name  = data.azurerm_resource_group.rg.name
 }
 
@@ -113,12 +113,65 @@ resource "azurerm_linux_virtual_machine" "vm" {
     username   = "azureuser"
     public_key = file("./pemkey.pub")
   }
-  custom_data = filebase64("./userdata.sh")
+  # custom_data = filebase64("./userdata.sh")
 
   # lifecycle {
-  #   create_before_destroy = true
+  #   prevent_destroy = true
   # }
 }
+
+#####################
+
+# Define the Kubernetes Access Rule
+
+# AKS Cluster
+resource "azurerm_kubernetes_cluster" "aks" {
+  count = var.is_aks_cluster_enabled ? 1 : 0
+  # count meta argument create multiple instances of a resource based on a specific condition
+  # If var.is_aks_cluster_enabled is true, the value of count will be 1. Resorce will create
+  # If var.is_aks_cluster_enabled is false, the value of count will be 0. cluster not created
+
+  name                    = var.cluster_name
+  resource_group_name     = data.azurerm_resource_group.rg.name
+  location                = data.azurerm_resource_group.rg.location
+  dns_prefix              = var.cluster_name
+  kubernetes_version      = var.cluster_version
+  private_cluster_enabled = var.private_cluster_enabled
+
+  default_node_pool {
+    name           = "default"
+    node_count     = var.default_node_count
+    vm_size        = var.default_vm_size
+    vnet_subnet_id = lookup(azurerm_subnet.subnet, "subnet-2").id
+  }
+
+  # Azure CNI Networking
+  network_profile {
+    network_plugin = "azure"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  # if public cluster use authorized ip for more security
+  api_server_access_profile {
+    authorized_ip_ranges = var.authorized_ip_ranges
+  }
+
+  tags = {
+    Name = var.cluster_name
+    Env  = var.env
+  }
+
+  depends_on = [
+    data.azurerm_resource_group.rg,
+    azurerm_virtual_network.vnet,
+    azurerm_subnet.subnet
+  ]
+}
+
+###########################
 
 resource "null_resource" "script" {
   provisioner "file" {
@@ -134,10 +187,10 @@ resource "null_resource" "script" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo chmod 777 /tmp/userdata.sh",
-      "sudo /tmp/userdata.sh",
+      "sudo chmod +x /tmp/userdata.sh",
+      "sudo timeout 300 /tmp/userdata.sh",
       "sudo apt update",
-      "sudo apt install jq uszip -y"
+      "sudo apt install -y jq unzip"
     ]
     connection {
       type        = "ssh"
@@ -146,4 +199,5 @@ resource "null_resource" "script" {
       host        = azurerm_public_ip.publicip.ip_address
     }
   }
+  depends_on = [azurerm_linux_virtual_machine.vm]
 }
