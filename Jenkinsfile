@@ -57,21 +57,21 @@ pipeline {
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker ') {
-                        sh "docker build -t Mathan23/bankapp:latest ."
+                        sh "docker build -t mathan23/bankapp:latest ."
                     }
                 }
             }
         }
         stage("Triy images scan"){
             steps{
-             sh "trivy image --format table -o fs-report.html Mathan23/bankapp:latest"   
+             sh "trivy image --format table -o fs-report.html mathan23/bankapp:latest"   
             }
         }
         stage("Docker image Push"){
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker ') {
-                        sh "docker push Mathan23/bankapp:latest"
+                        sh "docker push mathan23/bankapp:latest"
                     }
                 }
             }
