@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage("Git-Checkout"){
             steps{
-                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/MathanKumar23/Devops.git'
+                git branch: 'Feature/test', credentialsId: 'git-cred', url: 'https://github.com/MathanKumar23/Devops.git'
             }
         }
         stage("Compile"){
@@ -42,12 +42,12 @@ pipeline {
         }
         stage("Build"){
             steps{
-             sh "mvn install -DskipTests=true"   
+             sh "mvn package -DskipTests=true"   
             }
         }
         stage("Publish to Nexus"){
             steps{
-             withMaven(globalMavenSettingsConfig: 'settings-maven', jdk: '', maven: '', mavenSettingsConfig: '', traceability: true) {
+             withMaven(globalMavenSettingsConfig: 'Maven-settings', jdk: '', maven: '', mavenSettingsConfig: '', traceability: true) {
                  sh "mvn deploy -DskipTests=true"
                  
              }  
@@ -73,6 +73,24 @@ pipeline {
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker ') {
                         sh "docker push mathan23/bankapp:latest"
                     }
+                }
+            }
+        }
+        
+        stage("Deploy to K8s"){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-token', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                    sh "kubectl apply -f ds.yaml -n webapps"
+                    sleep 30
+                }
+            }
+        }
+        stage("Verify Deployment"){
+            steps{
+                //withKubeConfig(caCertificate: '', clusterName: 'aks', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'aks-m44rco14.hcp.westus3.azmk8s.io') {
+                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-token', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                    sh "kubectl get pods -n webapps"
+                    sh "kubectl get svc -n webapps"
                 }
             }
         }
