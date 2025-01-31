@@ -71,7 +71,7 @@ nsg_rules = [
   }
 ]
 
-public_ip         = "10.0.0.10"
+public_ip         = "terraIp"
 allocation_method = "Static"
 nic_name          = "terraNic"
 vm_name           = "terraVm"
