@@ -60,38 +60,38 @@ After provisioning the infrastructure, the following tools are set up on the VM:
 
 1. Jenkins
 
-- Access Jenkins at http://<public-ip>:8080.
-- Default password is stored in /var/lib/jenkins/secrets/initialAdminPassword.
-- Create a new user and install the required plugins:
-  SonarQube Scanner
-  Config File Provider
-  Maven Integration
-  Pipeline Maven Integration
-  Docker plugins
-  Kubernetes plugins
+   - Access Jenkins at http://<public-ip>:8080.
+   - Default password is stored in /var/lib/jenkins/secrets/initialAdminPassword.
+   - Create a new user and install the required plugins:
+     - SonarQube Scanner
+     - Config File Provider
+     - Maven Integration
+     - Pipeline Maven Integration
+     - Docker plugins
+     - Kubernetes plugins
 
 2. SonarQube
 
-- Access SonarQube at http://<public-ip>:9000.
-- Default username: admin, default password: admin.
-- Create a new password after the first login.
+   - Access SonarQube at http://<public-ip>:9000.
+   - Default username: admin, default password: admin.
+   - Create a new password after the first login.
 
 3. Nexus
 
-- Access Nexus at http://<public-ip>:8081.
-- Default password is stored in /nexus-data/admin.password.
+   - Access Nexus at http://<public-ip>:8081.
+   - Default password is stored in /nexus-data/admin.password.
 
 ### Jenkins Pipeline Configuration
 
 1. Configure Tools in Jenkins:
 
-- Add Maven, Docker, and Kubernetes CLI.
-- Add credentials for Git (if using a private repository), Docker, and Kubernetes.
+   - Add Maven, Docker, and Kubernetes CLI.
+   - Add credentials for Git (if using a private repository), Docker, and Kubernetes.
 
 2. Configure SonarQube Server:
 
-- Go to Manage Jenkins > Configure System
-- Add SonarQube server details.
+   - Go to Manage Jenkins > Configure System
+   - Add SonarQube server details.
 
 3. Configure Nexus in Maven Settings:
 
@@ -101,31 +101,31 @@ After provisioning the infrastructure, the following tools are set up on the VM:
 
 4. Jenkinsfile
 
-- The Jenkinsfile in the repository defines the pipeline stages:
-  Checkout code
-  Build the application using Maven
-  Run SonarQube analysis
-  Build and push Docker images
-  Deploy to AKS
+   - The Jenkinsfile in the repository defines the pipeline stages:
+     Checkout code
+     Build the application using Maven
+     Run SonarQube analysis
+     Build and push Docker images
+     Deploy to AKS
 
 ### Deploying the Application
 
 1. Update the pom.xml file:
 
-- Modify the <distributionManagement> block with your Nexus repository details.
+   - Modify the <distributionManagement> block with your Nexus repository details.
 
 2. Run the Jenkins pipeline:
 
-- Create a new pipeline job in Jenkins.
-- Point it to the Jenkinsfile in this repository.
-- Start the pipeline.
+   - Create a new pipeline job in Jenkins.
+   - Point it to the Jenkinsfile in this repository.
+   - Start the pipeline.
 
 3. The pipeline will:
 
-- Build the application.
-- Run SonarQube analysis.
-- Build and push the Docker image to the registry.
-- Deploy the application to AKS..
+   - Build the application.
+   - Run SonarQube analysis.
+   - Build and push the Docker image to the registry.
+   - Deploy the application to AKS..
 
 ### Accessing the Application
 
@@ -133,6 +133,7 @@ Once the pipeline completes successfully, the application will be deployed to AK
 
 ### Repository Structure
 
+```bash
 MultiTier-JenkinsCICD/
 ├── Infra_Terraform/ # Terraform configuration files for infrastructure provisioning
 ├── src/ # Spring Boot application source code
@@ -141,6 +142,7 @@ MultiTier-JenkinsCICD/
 ├── Dockerfile # Dockerfile for image
 ├── k8s.yaml # App, DB deployment and service file
 └── README.md # Project documentation
+```
 
 ### Contributing
 
