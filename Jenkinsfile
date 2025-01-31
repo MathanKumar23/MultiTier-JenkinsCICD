@@ -9,6 +9,8 @@ pipeline {
     // 
     environment{
         SCANNER_HOME= tool "sonar-scanner"
+        IMAGE_NAME = "mathan23/bankapp"
+        IMAGE_TAG = "${BUILD_NUMBER}"  // Unique version for each build
     }
     
     stages {
@@ -57,21 +59,21 @@ pipeline {
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker ') {
-                        sh "docker build -t mathan23/bankapp:latest ."
+                        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                     }
                 }
             }
         }
         stage("Triy images scan"){
             steps{
-             sh "trivy image --format table -o fs-report.html mathan23/bankapp:latest"   
+             sh "trivy image --format table -o fs-report.html ${IMAGE_NAME}:${IMAGE_TAG}"   
             }
         }
         stage("Docker image Push"){
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker ') {
-                        sh "docker push mathan23/bankapp:latest"
+                        sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                     }
                 }
             }
@@ -79,9 +81,13 @@ pipeline {
         
         stage("Deploy to K8s"){
             steps{
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-token', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                script {
+                    // Replace image tag in Kubernetes manifest
+                    sh "sed -i 's|__IMAGE_VERSION__|${IMAGE_TAG}|g' ds.yaml"
+                    withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s-token', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
                     sh "kubectl apply -f ds.yaml -n webapps"
                     sleep 30
+                    }
                 }
             }
         }
