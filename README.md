@@ -3,7 +3,7 @@
 This project demonstrates a multi-tier CI/CD pipeline using Jenkins, Terraform, SonarQube, Nexus, and Azure Kubernetes Service (AKS). The pipeline automates the deployment of a Spring Boot application (`bankapp`) to AKS after provisioning the infrastructure using Terraform.
 
 For a **detailed step-by-step guide**, check out my Medium blog:  
-👉 [Medium Blog: Multi-Tier Jenkins CI/CD Pipeline with Terraform, Jenkins, SonarQube, Nexus, and AKS](https://medium.com/@mathankumararumugasamy/multi-tier-jenkins-ci-cd-pipeline-with-terraform-jenkins-sonarqube-nexus-and-aks-3c7f5546c145){:target="_blank"}
+👉 <a href="https://medium.com/@mathankumararumugasamy/multi-tier-jenkins-ci-cd-pipeline-with-terraform-jenkins-sonarqube-nexus-and-aks-3c7f5546c145" target="_blank">Medium Blog: Multi-Tier Jenkins CI/CD Pipeline with Terraform, Jenkins, SonarQube, Nexus, and AKS</a>
 
 ## Table of Contents
 
