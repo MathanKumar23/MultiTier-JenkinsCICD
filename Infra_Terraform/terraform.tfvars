@@ -68,10 +68,21 @@ nsg_rules = [
     destination_port_range     = "8081"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
+  },
+  {
+    name                       = "Allow8082"
+    priority                   = "150"
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "8082"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 ]
 
-public_ip         = "terraIp"
+public_ip         = "Ip"
 allocation_method = "Static"
 nic_name          = "terraNic"
 vm_name           = "terraVm"
